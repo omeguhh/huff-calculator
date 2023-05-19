@@ -1,0 +1,66 @@
+// Wrapper methods (for testing)
+#define macro SAFE_ADD_WRAPPER() = takes (0) returns (0) {
+    0x04 calldataload       // [num1]
+    0x24 calldataload       // [num2, num1]
+    ADD_TWO()              // [result]
+    0x00 mstore             // []
+    0x20 0x00 return        // []
+}
+
+#define macro SAFE_SUB_WRAPPER() = takes (0) returns (0) {
+    0x04 calldataload       // [num1]
+    0x24 calldataload       // [num2, num1]
+    swap1                   // [num1, num2]
+    SUB_TWO()              // [result]
+    0x00 mstore             // []
+    0x20 0x00 return        // []
+}
+
+#define macro SAFE_MUL_WRAPPER() = takes (0) returns (0) {
+    0x04 calldataload       // [num1]
+    0x24 calldataload       // [num2, num1]
+    MUL_TWO()              // [result]
+    0x00 mstore             // []
+    0x20 0x00 return        // []
+}
+
+#define macro SAFE_DIV_WRAPPER() = takes (0) returns (0) {
+    0x04 calldataload       // [num1]
+    0x24 calldataload       // [num2, num1]
+    swap1                   // [num1, num2]
+    DIV_TWO()              // [result]
+    0x00 mstore             // []
+    0x20 0x00 return        // []
+}
+
+#define macro SAFE_MOD_WRAPPER() = takes (0) returns (0) {
+    0x04 calldataload       // [num1]
+    0x24 calldataload       // [num2, num1]
+    swap1                   // [num1, num2]
+    MOD_TWO()              // [result]
+    0x00 mstore             // []
+    0x20 0x00 return        // []
+}
+
+// Main
+#define macro MAIN() = takes (0) returns (0) {
+    0x00 calldataload 0xE0 shr
+    dup1 __FUNC_SIG(addTwo) eq addTwo jumpi
+    dup1 __FUNC_SIG(subTwo) eq subTwo jumpi
+    dup1 __FUNC_SIG(mulTwo) eq mulTwo jumpi
+    dup1 __FUNC_SIG(divTwo) eq divTwo jumpi
+    dup1 __FUNC_SIG(modTwo) eq modTwo jumpi
+
+    0x00 0x00 revert
+
+    addTwo:
+        SAFE_ADD_WRAPPER()
+    subTwo:
+        SAFE_SUB_WRAPPER()
+    mulTwo:
+        SAFE_MUL_WRAPPER()
+    divTwo:
+        SAFE_DIV_WRAPPER()
+    modTwo:
+        SAFE_MOD_WRAPPER()
+}

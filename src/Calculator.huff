@@ -1,0 +1,72 @@
+///@author Omeguhh
+///@title SafeMath rewritten in Huff  
+
+// Interface
+#define function addTwo(uint256,uint256) pure returns(uint256)
+#define function subTwo(uint256,uint256) view returns(uint256)
+#define function mulTwo(uint256,uint256) view returns(uint256)
+#define function divTwo(uint256,uint256) view returns(uint256)
+#define function modTwo(uint256,uint256) view returns(uint256)
+
+
+
+
+
+#define macro ADD_TWO() = takes (2) returns (1) {
+    // input stack          // [a, b]
+    dup2                    // [b, a, b]
+    add                     // [res, b]
+    dup1                    // [res, res, b]
+    swap2                   // [b, res, res]
+    gt                      // [is_overflow, res]
+    iszero                  // [not_overflow, res]
+    not_overflow jumpi   // [res]
+        0x00 0x00 revert
+    not_overflow:        // [res]
+}
+
+#define macro SUB_TWO() = takes (2) returns (1) {
+    //input stack           //[a, b]
+    dup1 dup3 gt iszero     // [(b > a == 0) , a,b]
+    not_overflow jumpi      
+        0x00 0x00 revert
+    
+    not_overflow:
+        sub
+}
+
+#define macro MUL_TWO() = takes(2) returns(1) {
+    //input             //[a,b]
+    dup1                //[a,a,b]
+    not_zero jumpi      //[a,b]
+        mul
+        0x01 not_overflow jumpi
+    not_zero:
+    dup2 dup2 mul       //[(a*b),a,b]
+    swap1 dup2 div      //[divRes, (a*b),b]
+    swap1 swap2         //[b,divRes,(a*b)]
+    eq                  //[not_overflow, (a*b)]
+    not_overflow jumpi  
+        0x00 0x00 revert
+    not_overflow:
+}
+
+#define macro DIV_TWO() = takes(2) returns(1) {
+    //a,b
+    dup2                        //[b,a,b]
+    not_zero jumpi              //[a,b]
+        0x00 0x00 revert
+    not_zero:
+    div                         //[res]
+}
+
+#define macro MOD_TWO() = takes(2) returns(1) {
+    //a,b
+    dup2                        //[b,a,b]
+    not_zero jumpi              //[a,b]
+        0x00 0x00 revert    
+    not_zero:
+    mod                         //[res]
+}
+
+
